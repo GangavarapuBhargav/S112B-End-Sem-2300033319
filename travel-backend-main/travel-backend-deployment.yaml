@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: travel-backend-deployment
+  labels:
+    app: travel-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: travel-backend
+  template:
+    metadata:
+      labels:
+        app: travel-backend
+    spec:
+      containers:
+        - name: travel-backend
+          image: travel-backend:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://mysql-service:3306/travelmanagement"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "root"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "YourRootPassword" # IMPORTANT: Replace with your actual password or use Kubernetes Secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: travel-backend-service
+  labels:
+    app: travel-backend
+spec:
+  selector:
+    app: travel-backend
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+  type: LoadBalancer
